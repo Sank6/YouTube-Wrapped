@@ -1,0 +1,34 @@
+{
+  "name": "youtube-wrapped",
+  "version": "1.0.0",
+  "description": "Spotify Wrapped but for YouTube (Because Rewind sucked).",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sank6/Youtube-Wrapped.git"
+  },
+  "keywords": [
+    "youtube",
+    "rewind",
+    "spotify"
+  ],
+  "author": "Sank6",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Sank6/Youtube-Wrapped/issues"
+  },
+  "homepage": "https://github.com/Sank6/Youtube-Wrapped#readme",
+  "devDependencies": {
+    "@types/cli-progress": "^3.9.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.4"
+  },
+  "dependencies": {
+    "axios": "^0.24.0",
+    "cli-progress": "^3.9.1"
+  }
+}
