@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "Spotify Wrapped but for YouTube (Because Rewind sucked).",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "ts-node index.ts",
+    "dev": "tsc && node index.js",
+    "build": "tsc && pkg .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -23,12 +25,19 @@
   },
   "homepage": "https://github.com/Sank6/Youtube-Wrapped#readme",
   "devDependencies": {
+    "@babel/cli": "^7.16.0",
+    "@babel/core": "^7.16.5",
     "@types/cli-progress": "^3.9.2",
+    "@types/prompts": "^2.0.14",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
   },
   "dependencies": {
     "axios": "^0.24.0",
-    "cli-progress": "^3.9.1"
+    "boxen": "^6.2.1",
+    "cli-progress": "^3.9.1",
+    "lodash": "^4.17.21",
+    "prompts": "^2.4.2",
+    "table": "^6.7.5"
   }
 }
