@@ -90,27 +90,47 @@ export default defineComponent({
       }
       return 0;
     },
-    async getInfo(stringData: string) {
+    async getInfo(stringData: string, json: boolean) {
       try {
         const beginningOfYear = new Date(new Date().getFullYear(), 0, 1);
-        const entries: Array<IEntry> = JSON.parse(stringData).filter((entry: IEntry) => {
-          const date = new Date(entry.time);
-          return date > beginningOfYear;
-        });
-        const chunks = entries.reduce((acc, entry, index) => {
-          const chunkIndex = Math.floor(index / 50);
-          if (!acc[chunkIndex]) acc[chunkIndex] = [];
-          acc[chunkIndex].push(entry);
-          return acc;
-        }, [] as Array<IEntry[]>);
-
         const urls: string[] = [];
-        for (const chunk of chunks) {
-          const entryIDs = chunk.map((content) => content.titleUrl?.split('=')[1]);
-          const url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${entryIDs.join(
-            encodeURIComponent(','),
-          )}&key=${this.apikey}`;
-          urls.push(url);
+
+        if (json) {
+          const entries: Array<IEntry> = JSON.parse(stringData).filter((entry: IEntry) => {
+            const date = new Date(entry.time);
+            return date > beginningOfYear;
+          });
+          const chunks = entries.reduce((acc, entry, index) => {
+            const chunkIndex = Math.floor(index / 50);
+            if (!acc[chunkIndex]) acc[chunkIndex] = [];
+            acc[chunkIndex].push(entry);
+            return acc;
+          }, [] as Array<IEntry[]>);
+          for (const chunk of chunks) {
+            const entryIDs = chunk.map((content) => content.titleUrl?.split('=')[1]);
+            const url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${entryIDs.join(
+              encodeURIComponent(','),
+            )}&key=${this.apikey}`;
+            urls.push(url);
+          }
+        } else {
+          const regexp = /<a href="https:\/\/www\.youtube\.com\/watch\?v=(.+?)".+?<\/a><br>.+?<\/a><br>(.+?GMT)<\/div>/g;
+          let matches: [string, Date][] = [...stringData.matchAll(regexp)]
+            .map((match) => [match[1], new Date(match[2])]);
+          matches = matches.filter(([, date]) => date >= beginningOfYear);
+          const chunks = matches.reduce((acc, entry, index) => {
+            const chunkIndex = Math.floor(index / 50);
+            if (!acc[chunkIndex]) acc[chunkIndex] = [];
+            acc[chunkIndex].push(entry);
+            return acc;
+          }, [] as Array<[string, Date][]>);
+          for (const chunk of chunks) {
+            const entryIDs = chunk.map((content) => content[0]);
+            const url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${entryIDs.join(
+              encodeURIComponent(','),
+            )}&key=${this.apikey}`;
+            urls.push(url);
+          }
         }
 
         const urlChunks = urls.reduce((acc, url, index) => {

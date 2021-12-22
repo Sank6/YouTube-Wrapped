@@ -45,7 +45,7 @@ export default defineComponent({
         const reader = new FileReader();
         reader.onload = (e: ProgressEvent<FileReader>) => {
           const { result } = e.target as FileReader;
-          if (result) this.$emit('load', String(result));
+          if (result) this.$emit('load', String(result), file.name.endsWith('.json'));
         };
         reader.readAsText(file);
       }
