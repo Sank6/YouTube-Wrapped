@@ -1,44 +1,43 @@
 {
   "name": "youtube-wrapped",
-  "version": "1.0.0",
-  "description": "Spotify Wrapped but for YouTube (Because Rewind sucked).",
-  "main": "index.js",
-  "type": "module",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "dev": "tsc && node index.js",
-    "build": "tsc && nexe index.js --build --output dist/Youtube-Wrapped --ico icon.ico",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Sank6/Youtube-Wrapped.git"
-  },
-  "keywords": [
-    "youtube",
-    "rewind",
-    "spotify"
-  ],
-  "author": "Sank6",
-  "license": "GPL-3.0-or-later",
-  "bugs": {
-    "url": "https://github.com/Sank6/Youtube-Wrapped/issues"
-  },
-  "homepage": "https://github.com/Sank6/Youtube-Wrapped#readme",
-  "devDependencies": {
-    "@babel/cli": "^7.16.0",
-    "@babel/core": "^7.16.5",
-    "@types/cli-progress": "^3.9.2",
-    "@types/prompts": "^2.0.14",
-    "nexe": "^4.0.0-beta.19",
-    "ts-node": "^10.4.0",
-    "typescript": "^4.5.4"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "tauri:build": "vue-cli-service tauri:build",
+    "tauri:serve": "vue-cli-service tauri:serve"
   },
   "dependencies": {
     "axios": "^0.24.0",
-    "boxen": "^6.2.1",
-    "cli-progress": "^3.9.1",
-    "lodash": "^4.17.21",
-    "prompts": "^2.4.2",
-    "table": "^6.7.5"
+    "core-js": "^3.6.5",
+    "vue": "^3.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.18.0",
+    "@typescript-eslint/parser": "^4.18.0",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-typescript": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.0.0",
+    "@vue/eslint-config-airbnb": "^5.0.2",
+    "@vue/eslint-config-typescript": "^7.0.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-vue": "^7.0.0",
+    "lint-staged": "^9.5.0",
+    "typescript": "~4.1.5",
+    "vue-cli-plugin-tauri": "~1.0.0-beta.6"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,vue,ts,tsx}": [
+      "vue-cli-service lint",
+      "git add"
+    ]
   }
 }
