@@ -5,7 +5,7 @@
       <FileInputButton ref="button" :apikey="apikey" @empty="flashkey" @load="getInfo" />
       <a
         ref="help"
-        href="https://github.com/Sank6/Youtube-Wrapped/blob/main/README.md"
+        href="https://github.com/Sank6/YouTube-Wrapped/blob/main/README.md"
         target="_blank"
         >help?</a
       >
