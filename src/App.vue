@@ -1,13 +1,17 @@
 <template>
-  <div id="play-button" @click="play" :class="zoom ? 'zoomed' : null">
-    <svg width="10" height="10" fill="white">
-      <path d="M0 0 L10 5 L0 10 Z" />
-    </svg>
+  <div>
+    <div id="play-button" ref="playbtn" @click="play" :class="zoom ? 'zoomed' : null">
+      <svg width="10" height="10" fill="white">
+        <path d="M0 0 L10 5 L0 10 Z" />
+      </svg>
+    </div>
+    <Load ref="load" />
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import Load from './components/Load.vue';
 
 export default defineComponent({
   name: 'App',
@@ -16,12 +20,18 @@ export default defineComponent({
       zoom: false,
     };
   },
-  components: {},
+  components: {
+    Load,
+  },
   methods: {
     play() {
       this.zoom = true;
       setTimeout(() => {
-        window.location.href = 'load';
+        const playbtn = this.$refs.playbtn as HTMLElement;
+        playbtn.style.display = 'none';
+        document.body.style.background = '#FFFFFF';
+        const load = this.$refs.load as (typeof Load);
+        load.load();
       }, 500);
     },
   },
@@ -42,11 +52,6 @@ body {
   overflow: hidden;
 }
 
-#app {
-  width: 100vw;
-  height: 100vh;
-}
-
 #play-button {
   width: 600px;
   height: 350px;
@@ -57,9 +62,9 @@ body {
   margin: 0;
   padding: 0 15px;
   background: #ff0000;
-  color: #fff;
+  color: #ffffff;
   border-radius: 50% / 11%;
-  transition: 1.5s ease-in-out all;
+  transition: 1s ease-in-out all;
 }
 
 #play-button::before {
@@ -81,7 +86,7 @@ body {
   transform: scale(50) !important;
 }
 
-svg {
+#play-button svg {
   position: absolute;
   left: 50%;
   top: 50%;

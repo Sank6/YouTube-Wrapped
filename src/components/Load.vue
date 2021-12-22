@@ -19,11 +19,11 @@
 <script lang="ts">
 import axios, { AxiosResponse } from 'axios';
 import { defineComponent } from 'vue';
-import TextInput from '../components/TextInput.vue';
-import FileInputButton from '../components/FileInputButton.vue';
-import FillingUp from '../components/FillingUp.vue';
-import Stats from '../components/Stats.vue';
-import ErrorComponent from '../components/Error.vue';
+import TextInput from './TextInput.vue';
+import FileInputButton from './FileInputButton.vue';
+import FillingUp from './FillingUp.vue';
+import Stats from './Stats.vue';
+import ErrorComponent from './Error.vue';
 
 interface IEntry {
   header: string;
@@ -36,7 +36,7 @@ interface IEntry {
 }
 
 export default defineComponent({
-  name: 'Upload',
+  name: 'Load',
   data() {
     return {
       zoom: false,
@@ -61,13 +61,13 @@ export default defineComponent({
     Stats,
     ErrorComponent,
   },
-  mounted() {
-    const content = this.$refs.content as HTMLElement;
-    setTimeout(() => {
-      content.style.transform = 'translate(-50%, -50%) scale(1)';
-    }, 100);
-  },
   methods: {
+    load() {
+      const content = this.$refs.content as HTMLElement;
+      setTimeout(() => {
+        content.style.transform = 'translate(-50%, -50%) scale(1)';
+      }, 100);
+    },
     play() {
       this.zoom = true;
     },
@@ -197,21 +197,6 @@ export default defineComponent({
   },
 });
 </script>
-
-<style>
-body {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #212121;
-  background-color: #ffffff;
-  margin: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-</style>
 
 <style scoped>
 #content {
