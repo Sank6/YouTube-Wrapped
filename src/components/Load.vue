@@ -47,6 +47,7 @@ export default defineComponent({
         videosWatched: 0,
         secondsWatched: 0,
         mostWatched: [] as unknown[],
+        mostTags: [] as { tag: string; count: number;}[],
       },
       error: {
         name: '',
@@ -154,13 +155,19 @@ export default defineComponent({
         }
 
         const channels: { [key: string]: [number, number, string] } = {}; // { channel: [videos, seconds, url] }
+        const tags: { [key: string]: number } = {}; // { tag: videos }
         for (const response of responses) {
           const {
             data: { items },
           } = response;
           for (const item of items) {
             if (item.kind === 'youtube#video') this.stats.videosWatched += 1;
-
+            if (item.snippet.tags) {
+              for (const tag of item.snippet.tags) {
+                if (!Object.prototype.hasOwnProperty.call(tags, tag)) tags[tag] = 1;
+                tags[tag] += 1;
+              }
+            }
             const duration = this.getDuration(item.contentDetails.duration);
             this.stats.secondsWatched += duration;
 
@@ -175,6 +182,11 @@ export default defineComponent({
 
         let mostWatched = Object.entries(channels).sort((a, b) => b[1][0] - a[1][0]);
         mostWatched = mostWatched.slice(0, 5);
+        console.log(Object.entries(tags));// , Object.entries(tags).sort((a, b) => b[1] - a[1]));
+        let mostTags = Object.entries(tags)
+          .sort((a, b) => b[1] - a[1])
+          .map(([tag, count]) => ({ tag, count }));
+        mostTags = mostTags.slice(0, 5);
         const changed = mostWatched.map(([channel, [videosWatchedInChannel, seconds, url]]) => ({
           name: channel,
           videos: videosWatchedInChannel,
@@ -182,6 +194,7 @@ export default defineComponent({
           url,
         }));
         this.stats.mostWatched = changed;
+        this.stats.mostTags = mostTags;
         const { key, button, help, water, content } = this.$refs as {
           key: typeof TextInput;
           button: typeof FileInputButton;

@@ -1,4 +1,4 @@
-<template>
+s<template>
     <div id="stats" ref="stats">
       <div id="minutes" ref="minutes">
         <h2>
@@ -9,6 +9,11 @@
         <h3>
           That's <span>{{ minutes }}</span> minutes of YouTube!
         </h3>
+        <p class="small">Top tags:
+          <span id="tags" v-for="(tag, i) in mostTags.map(({tag, count}) => tag)" v-bind:key="i">
+            <span class="tag">{{ tag }}</span>
+          </span>
+        </p>
         <button @click="topChannels">View your top channels 👉</button>
       </div>
       <div id="channels" ref="channels">
@@ -37,13 +42,18 @@
             </tbody>
           </table>
         </div>
-        <button>Share 🔗</button>
+        <button @click="genImage">Share 🔗</button>
+      </div>
+      <div id="hidden">
+        <canvas id="canvas" ref="canvas" width="500" height="500"></canvas>
       </div>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { Canvas, resolveImage } = require('canvas-constructor');
 
 export default defineComponent({
   name: 'Stats',
@@ -52,6 +62,7 @@ export default defineComponent({
     videosWatched: Number,
     secondsWatched: Number,
     mostWatched: Array,
+    mostTags: Array,
   },
   data() {
     return {
@@ -79,6 +90,62 @@ export default defineComponent({
           channels.style.transform = 'translate(0, 0)';
         }, 200);
       }, 200);
+    },
+    async genImage() {
+      const canvas = document.getElementById('canvas');
+      const icon = await resolveImage('./icon.png'); // https://via.placeholder.com/50x50
+      const tagsToPrint = (this.mostTags as {tag: string; count: number;}[]).map(({ tag }) => tag).join(', ');
+      let drawing = new Canvas(canvas)
+        .setColor('#212121')
+        .printRectangle(0, 0, 500, 500)
+        .printImage(icon, 25, 25, 75, 75)
+        .setColor('#4f4f4f')
+        .setTextFont('20px Verdana')
+        .printText('2021 Wrapped', 125, 70)
+        .setColor('#ff0000')
+        .printRoundedRectangle(295, 60, 200, 5, 5)
+        .setColor('#ffffff')
+        .printText('Minutes Watched', 25, 150)
+        .printText('Videos Watched', 25, 250)
+        .printText('Top tags', 25, 350)
+        .setTextFont('bold 25px Verdana')
+        .printText('Top Channels', 230, 150)
+        .setColor('#ff0000')
+        .setTextFont('bold 40px Verdana')
+        .printText(this.minutes.toLocaleString(), 25, 210)
+        .printText((this.videosWatched as number).toLocaleString(), 25, 310)
+        .setColor('#4f4f4f')
+        .setTextAlign('center')
+        .setTextFont('14px Verdana')
+        .printText('Sank6/YouTube-Wrapped', 250, 480)
+        .setTextAlign('left')
+        .printWrappedText(tagsToPrint, 25, 380, 200)
+        .setTextFont('16px Verdana');
+      if (this.mostWatched) {
+        for (let i = 0; i < this.mostWatched.length; i += 1) {
+          const channel = this.mostWatched[i] as {
+            name: string;
+            url: string;
+            videos: number;
+            minutes: number;
+          };
+          drawing = drawing
+            .setColor('#ffffff')
+            .printText(channel.name, 230, 200 + i * 50)
+            .setColor('#4f4f4f')
+            .printText(`${channel.videos} videos, ${channel.minutes} minutes`, 230, 220 + i * 50);
+        }
+      }
+      const url = drawing.toDataURL('image/png');
+      this.download(url, 'youtube-wrapped.png');
+    },
+    download(uri: string, name: string) {
+      const link = document.createElement('a');
+      link.download = name;
+      link.href = uri;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
     },
   },
   mounted() {
@@ -146,6 +213,11 @@ span {
   color: #ff0000;
 }
 
+span:not(:last-child):after {
+    content: ", ";
+    color: white;
+}
+
 button {
   background-color: #ffffff;
   color: #212121;
@@ -177,5 +249,9 @@ table th {
   padding-top: 12px;
   padding-bottom: 12px;
   background-color: #ff0000;
+}
+
+#hidden {
+  display: none;
 }
 </style>
