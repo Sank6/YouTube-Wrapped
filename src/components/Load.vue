@@ -43,7 +43,7 @@ export default defineComponent({
       apikey: '',
       colour: '#212121',
       stats: {
-        year: new Date().getFullYear(),
+        year: 0,
         videosWatched: 0,
         secondsWatched: 0,
         mostWatched: [] as unknown[],
@@ -93,7 +93,10 @@ export default defineComponent({
     },
     async getInfo(stringData: string, json: boolean) {
       try {
-        const beginningOfYear = new Date(new Date().getFullYear(), 0, 1);
+        const d = new Date();
+        const yearOfWrapped = d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear();
+        this.stats.year = yearOfWrapped;
+        const beginningOfYear = new Date(yearOfWrapped, 0, 1);
         const urls: string[] = [];
 
         if (json) {
@@ -182,7 +185,6 @@ export default defineComponent({
 
         let mostWatched = Object.entries(channels).sort((a, b) => b[1][0] - a[1][0]);
         mostWatched = mostWatched.slice(0, 5);
-        console.log(Object.entries(tags));// , Object.entries(tags).sort((a, b) => b[1] - a[1]));
         let mostTags = Object.entries(tags)
           .sort((a, b) => b[1] - a[1])
           .map(([tag, count]) => ({ tag, count }));

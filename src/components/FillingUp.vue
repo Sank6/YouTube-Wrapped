@@ -53,13 +53,13 @@ export default defineComponent({
 }
 #water .fill {
   transform: translate(0, 151px);
-  transition: all cubic-bezier(0.2, 0.6, 0.8, 0.4) 0.4s;
+  transition: all cubic-bezier(0.2, 0.6, 0.8, 0.4) 750ms;
 }
 #water #waveShape {
   animation-name: waveAction;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
-  animation-duration: 0.5s;
+  animation-duration: 750ms;
   width: 300px;
   height: 150px;
 }

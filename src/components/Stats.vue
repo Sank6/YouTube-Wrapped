@@ -42,7 +42,7 @@ s<template>
             </tbody>
           </table>
         </div>
-        <button @click="genImage">Share 🔗</button>
+        <button @click="genImage">Download 🔗</button>
       </div>
       <div id="hidden">
         <canvas id="canvas" ref="canvas" width="500" height="500"></canvas>
@@ -99,9 +99,9 @@ export default defineComponent({
         .setColor('#212121')
         .printRectangle(0, 0, 500, 500)
         .printImage(icon, 25, 25, 75, 75)
-        .setColor('#4f4f4f')
+        .setColor('#6f6f6f')
         .setTextFont('20px Verdana')
-        .printText('2021 Wrapped', 125, 70)
+        .printText(`${this.year} Wrapped`, 125, 70)
         .setColor('#ff0000')
         .printRoundedRectangle(295, 60, 200, 5, 5)
         .setColor('#ffffff')
@@ -114,7 +114,7 @@ export default defineComponent({
         .setTextFont('bold 40px Verdana')
         .printText(this.minutes.toLocaleString(), 25, 210)
         .printText((this.videosWatched as number).toLocaleString(), 25, 310)
-        .setColor('#4f4f4f')
+        .setColor('#6f6f6f')
         .setTextAlign('center')
         .setTextFont('14px Verdana')
         .printText('Sank6/YouTube-Wrapped', 250, 480)
@@ -155,7 +155,7 @@ export default defineComponent({
         if (newMin > this.minutes) this.minutes += Math.ceil((newMin - this.minutes) / 50);
         if (this.videosWatched > this.videosWatchedDisplay) {
           this.videosWatchedDisplay += Math.ceil(
-            (this.videosWatched - this.videosWatchedDisplay) / 100,
+            (this.videosWatched - this.videosWatchedDisplay) / 50,
           );
         }
       }
