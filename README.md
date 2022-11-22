@@ -10,7 +10,7 @@
 # How to use
 1. Request your data from Google using [Google Takeout](https://takeout.google.com/).
 2. Get a [Google API key](https://console.cloud.google.com/apis/credentials).
-3. Run the [standalone executable](https://github.com/Sank6/YouTube-Wrapped/releases) or use the [online version](https://youtube-wrapped.tech).
+3. Run the [standalone executable](https://github.com/Sank6/YouTube-Wrapped/releases) or use the [online version](https://youtubewrapped.vercel.app/).
 4. Use the Google API key and open the watch history file from your takeout: `YouTube and YouTube Music/history`.
 
 If you need more help, check the pages on the [wiki](https://github.com/Sank6/YouTube-Wrapped/wiki).
