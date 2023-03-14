@@ -166,7 +166,7 @@ export default defineComponent({
           for (const item of items) {
             if (item.kind === 'youtube#video') this.stats.videosWatched += 1;
             if (item.snippet.tags) {
-              for (const tag of item.snippet.tags) {
+              for (const tag of item.snippet.tags.slice(0, 5)) {
                 if (!Object.prototype.hasOwnProperty.call(tags, tag)) tags[tag] = 1;
                 tags[tag] += 1;
               }
@@ -213,11 +213,12 @@ export default defineComponent({
         const stats = this.$refs.stats as typeof Stats;
         stats.show();
       } catch (error) {
+        console.error(error);
         const water = this.$refs.water as typeof FillingUp;
         this.colour = '#FF0000';
         water.fill(105);
         let { name } = error as Error;
-        const { message } = error as Error; // 😠 eslint yourself
+        const { message } = error as Error;
         if (message === 'Request failed with status code 400') name = 'Invalid API key';
         if (message === 'Request failed with status code 403') name = 'Rate limit exceeded';
         if (message === 'Request failed with status code 404') name = 'Invalid watch-history.json';
