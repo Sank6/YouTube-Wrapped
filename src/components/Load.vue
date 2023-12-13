@@ -3,12 +3,7 @@
     <div id="content" ref="content">
       <TextInput id="apikey" ref="key" prompt="Google API Key" @input="loadkey" />
       <FileInputButton ref="button" :apikey="apikey" @empty="flashkey" @load="getInfo" />
-      <a
-        ref="help"
-        href="https://github.com/Sank6/YouTube-Wrapped/wiki"
-        target="_blank"
-        >help?</a
-      >
+      <a ref="help" href="https://github.com/Sank6/YouTube-Wrapped/wiki" target="_blank">help?</a>
       <FillingUp ref="water" :colour="colour" />
       <Stats ref="stats" id="stats" v-bind="stats" />
       <ErrorComponent ref="error" v-bind="error" />
@@ -47,7 +42,7 @@ export default defineComponent({
         videosWatched: 0,
         secondsWatched: 0,
         mostWatched: [] as unknown[],
-        mostTags: [] as { tag: string; count: number;}[],
+        mostTags: [] as { tag: string; count: number }[],
       },
       error: {
         name: '',
@@ -118,9 +113,21 @@ export default defineComponent({
             urls.push(url);
           }
         } else {
-          const regexp = /<a href="https:\/\/www\.youtube\.com\/watch\?v=(.+?)".+?<\/a><br>.+?<\/a><br>(.+?GMT)<\/div>/g;
-          let matches: [string, Date][] = [...stringData.matchAll(regexp)]
-            .map((match) => [match[1], new Date(match[2])]);
+          // eslint-disable-next-line no-irregular-whitespace
+          const videoIdRegex = /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g;
+          // eslint-disable-next-line no-irregular-whitespace
+          const dateRegex = /<br>([a-zA-Z]{3} \d{1,2}, \d{4}, \d{1,2}:\d{1,2}:\d{1,2} (?:AM|PM) [a-zA-Z]{3})<\/div>/g;
+          const videoIdMatches: string[] = [...stringData.matchAll(videoIdRegex)].map(
+            (match) => match[1],
+          );
+          const dateMatches: Date[] = [...stringData.matchAll(dateRegex)].map(
+            (match) => new Date(match[1]),
+          );
+          let matches: [string, Date][] = dateMatches.map((element, index) => [
+            videoIdMatches[index],
+            element,
+          ]);
+
           matches = matches.filter(([, date]) => date >= beginningOfYear);
           const chunks = matches.reduce((acc, entry, index) => {
             const chunkIndex = Math.floor(index / 50);
@@ -177,11 +184,22 @@ export default defineComponent({
             if (Object.hasOwnProperty.call(channels, item.snippet.channelTitle)) {
               channels[item.snippet.channelTitle][0] += 1;
               channels[item.snippet.channelTitle][1] += duration;
-            } else channels[item.snippet.channelTitle] = [1, duration, `https://www.youtube.com/channel/${item.snippet.channelId}`];
+            } else {
+              channels[item.snippet.channelTitle] = [
+                1,
+                duration,
+                `https://www.youtube.com/channel/${item.snippet.channelId}`,
+              ];
+            }
           }
         }
 
-        if (this.stats.videosWatched === 0) throw new Error('Invalid watch-history.json. No videos found.');
+        if (this.stats.videosWatched === 0) {
+          if (!json) {
+            throw new Error('Invalid watch-history.html. No videos found.');
+          }
+          throw new Error('Invalid watch-history.json. No videos found.');
+        }
 
         let mostWatched = Object.entries(channels).sort((a, b) => b[1][0] - a[1][0]);
         mostWatched = mostWatched.slice(0, 5);
