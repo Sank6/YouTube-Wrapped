@@ -30,6 +30,31 @@ interface IEntry {
   activityControls: string[];
 }
 
+
+
+interface IResponse {
+  kind: string;
+  etag: string;
+  nextPageToken: string;
+  prevPageToken: string;
+  pageInfo: {
+    totalResults: number;
+    resultsPerPage: number
+  };
+  items: {
+    kind: "youtube#video";
+    snippet: {
+      channelId: string;
+      title: string;
+      tags: string[];
+      channelTitle: string;
+    }
+    contentDetails: {
+      duration: string;
+    }
+  }[]
+}
+
 export default defineComponent({
   name: 'Load',
   data() {
@@ -87,6 +112,14 @@ export default defineComponent({
       return 0;
     },
     async getInfo(stringData: string, json: boolean) {
+
+      // Debug Information
+      let debugMatches = -1;
+      let debugMatchesThisYear = -1;
+      let debugNumChunks = -1;
+      let debugRequests = -1;
+
+
       try {
         const d = new Date();
         const yearOfWrapped = d.getMonth() === 0 ? d.getFullYear() - 1 : d.getFullYear();
@@ -113,14 +146,12 @@ export default defineComponent({
             urls.push(url);
           }
         } else {
-          // eslint-disable-next-line no-irregular-whitespace
-          const videoIdRegex = /https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g;
-          // eslint-disable-next-line no-irregular-whitespace
-          const dateRegex = /<br>([a-zA-Z]{3} \d{1,2}, \d{4}, \d{1,2}:\d{1,2}:\d{1,2} (?:AM|PM) [a-zA-Z]{3})<\/div>/g;
-          const videoIdMatches: string[] = [...stringData.matchAll(videoIdRegex)].map(
+          const videoIdRegex = /Watched <a href="https:\/\/www\.youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/g;
+          const dateRegex = /<\/a><br>([a-zA-Z]{3} \d{1,2}, \d{4}, \d{1,2}:\d{1,2}:\d{1,2}\s(?:AM|PM) [a-zA-Z]{3})<\/div>/g;
+          const videoIdMatches = [...stringData.matchAll(videoIdRegex)].map(
             (match) => match[1],
           );
-          const dateMatches: Date[] = [...stringData.matchAll(dateRegex)].map(
+          const dateMatches = [...stringData.matchAll(dateRegex)].map(
             (match) => new Date(match[1]),
           );
           let matches: [string, Date][] = dateMatches.map((element, index) => [
@@ -128,13 +159,16 @@ export default defineComponent({
             element,
           ]);
 
+          debugMatches = matches.length;
           matches = matches.filter(([, date]) => date >= beginningOfYear);
+          debugMatchesThisYear = matches.length;
           const chunks = matches.reduce((acc, entry, index) => {
             const chunkIndex = Math.floor(index / 50);
             if (!acc[chunkIndex]) acc[chunkIndex] = [];
             acc[chunkIndex].push(entry);
             return acc;
           }, [] as Array<[string, Date][]>);
+          debugNumChunks = chunks.length;
           for (const chunk of chunks) {
             const entryIDs = chunk.map((content) => content[0]);
             const url = `https://youtube.googleapis.com/youtube/v3/videos?part=snippet%2CcontentDetails%2Cstatistics&id=${entryIDs.join(
@@ -151,9 +185,9 @@ export default defineComponent({
           return acc;
         }, [] as string[][]);
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let responses: AxiosResponse<any, any>[] = [];
+        let responses: AxiosResponse<IResponse>[] = [];
         let index = 0;
+        debugRequests = 0;
         for (const urlChunk of urlChunks) {
           const temp = await Promise.all(
             urlChunk.map((url) => axios.get(url, { responseType: 'json' })),
@@ -163,6 +197,7 @@ export default defineComponent({
           const water = this.$refs.water as typeof FillingUp;
           water.fill(Math.floor((index / urlChunks.length) * 100) + 5);
         }
+        debugRequests = urlChunks.length;
 
         const channels: { [key: string]: [number, number, string] } = {}; // { channel: [videos, seconds, url] }
         const tags: { [key: string]: number } = {}; // { tag: videos }
@@ -171,7 +206,7 @@ export default defineComponent({
             data: { items },
           } = response;
           for (const item of items) {
-            if (item.kind === 'youtube#video') this.stats.videosWatched += 1;
+            this.stats.videosWatched += 1;
             if (item.snippet.tags) {
               for (const tag of item.snippet.tags.slice(0, 5)) {
                 if (!Object.prototype.hasOwnProperty.call(tags, tag)) tags[tag] = 1;
@@ -232,6 +267,15 @@ export default defineComponent({
         stats.show();
       } catch (error) {
         console.error(error);
+        console.log("--------------");
+        console.log("Debug Information");
+        console.log(`Matches: ${debugMatches}`);
+        console.log(`Matches this year: ${debugMatchesThisYear}`);
+        console.log(`Number of chunks: ${debugNumChunks}`);
+        console.log(`Number of requests: ${debugRequests}`);
+        console.log(`Stats: ${JSON.stringify(this.stats)}`);
+        console.log("--------------");
+
         const water = this.$refs.water as typeof FillingUp;
         this.colour = '#FF0000';
         water.fill(105);
