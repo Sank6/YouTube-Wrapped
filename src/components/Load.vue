@@ -41,7 +41,7 @@ export default defineComponent({
         year: 0,
         videosWatched: 0,
         secondsWatched: 0,
-        mostWatched: [] as unknown[],
+        mostWatched: [] as { name: string; videos: number; minutes: number; url: string; }[],
         mostTags: [] as { tag: string; count: number }[],
       },
       error: {

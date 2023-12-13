@@ -1,4 +1,4 @@
-s<template>
+<template>
     <div id="stats" ref="stats">
       <div id="minutes" ref="minutes">
         <h2>
@@ -10,7 +10,7 @@ s<template>
           That's <span>{{ minutes }}</span> minutes of YouTube!
         </h3>
         <p class="small">Top tags:
-          <span id="tags" v-for="(tag, i) in mostTags.map(({tag, count}) => tag)" v-bind:key="i">
+          <span id="tags" v-for="(tag, i) in mostTags?.map(({tag}) => tag)" v-bind:key="i">
             <span class="tag">{{ tag }}</span>
           </span>
         </p>
@@ -52,8 +52,7 @@ s<template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { Canvas, resolveImage } = require('canvas-constructor');
+import { Canvas, loadImage } from 'canvas-constructor/browser';
 
 export default defineComponent({
   name: 'Stats',
@@ -61,8 +60,8 @@ export default defineComponent({
     year: Number,
     videosWatched: Number,
     secondsWatched: Number,
-    mostWatched: Array,
-    mostTags: Array,
+    mostWatched: Array<{ name: string; videos: number; minutes: number; url: string; }>,
+    mostTags: Array<{ tag: string; count: number }>,
   },
   data() {
     return {
@@ -92,8 +91,8 @@ export default defineComponent({
       }, 200);
     },
     async genImage() {
-      const canvas = document.getElementById('canvas');
-      const icon = await resolveImage('./icon.png'); // https://via.placeholder.com/50x50
+      const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+      const icon = await loadImage('./icon.png'); // https://via.placeholder.com/50x50
       const tagsToPrint = (this.mostTags as {tag: string; count: number;}[]).map(({ tag }) => tag).join(', ');
       let drawing = new Canvas(canvas)
         .setColor('#212121')
